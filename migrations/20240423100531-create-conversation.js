@@ -10,10 +10,18 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       senderId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          id: 'id'
+        }
       },
       receiverId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          id: 'id'
+        }
       },
       createdAt: {
         allowNull: false,

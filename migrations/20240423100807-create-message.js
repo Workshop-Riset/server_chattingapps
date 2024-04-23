@@ -10,13 +10,25 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       conversationId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Conversations',
+          key: 'id'
+        }
       },
       senderId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          id: 'id'
+        }
       },
       receiverId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          id: 'id'
+        }
       },
       message: {
         type: Sequelize.STRING
