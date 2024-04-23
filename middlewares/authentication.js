@@ -18,7 +18,6 @@ async function authentication(req, res, next){
 
         req.user = {
             id: payload.id,
-            role: findUser.role,
             email: findUser.email
         }
 

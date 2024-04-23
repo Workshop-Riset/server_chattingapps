@@ -9,6 +9,10 @@ if(process.env.NODE_ENV !== "production"){
   const app = express()
   const port = process.env.PORT || 3000
   const userRouter = require('./routes/user')
+  const friendRouter = require('./routes/friend')
+  const messageRouter = require('./routes/message')
+  const conversationRouter = require('./routes/conversation')
+  const profileRouter = require('./routes/profile')
   const errorHandler = require('./helpers/errorHandle')
   const cors = require('cors')
   
@@ -17,16 +21,20 @@ if(process.env.NODE_ENV !== "production"){
   app.use(cors())
   
   app.get('/', (req, res) => {
-    res.send("yoooo")
+    res.send("gassken")
   })
   
   app.use(router)
   
-  router.use('/users', userRouter)
-  
-  
+  router.use('/', userRouter)
+  router.use('/', friendRouter)
+  router.use('/', messageRouter)
+  router.use('/', conversationRouter)
+  router.use('/', profileRouter)
   
   app.use(errorHandler)
+  
+  // app.use(errorHandler)
   app.listen(port, () => {
       console.log(`Example app listening on port ${port}`)
     })
