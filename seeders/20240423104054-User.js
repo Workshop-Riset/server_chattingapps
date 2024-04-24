@@ -6,12 +6,12 @@ const { hashPassword } = require('../helpers/hash');
 module.exports = {
   async up(queryInterface, Sequelize) {
     let data = require('../data/users.json');
-    data = await Promise.all(data.map(async (el) => {
-      el.createdAt = el.updatedAt = new Date();
-      el.password = await hashPassword(el.password);
-      return el;
-    }));
-
+    // console.log(data);
+    data.map((el) => {
+      el.password = hashPassword(el.password)
+      return el
+    })
+    // console.log(data);
     await queryInterface.bulkInsert('Users', data, {});
   },
 
