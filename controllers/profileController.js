@@ -1,4 +1,3 @@
-const { types } = require('pg');
 const {
     Profile, User
 } = require('../models/index')
@@ -66,11 +65,7 @@ class ProfileController {
             },{
                 where : {userId}
             })
-            // updateProfile = {
-            //     fullName : addProfile.fullName,
-            //     address : addProfile.address,
-            //     bio : addProfile.bio,
-            // }
+           
             res.status(200).json({message : 'update profile success'})
         } catch (error) {
             next(error)
@@ -80,6 +75,7 @@ class ProfileController {
     static async uploadImage(req, res, next) {
         try {
             const findProfile = await Profile.findOne({where : {userId : req.user.id}});
+1
             if (!findProfile) {
                 throw {name: 'not found', type: 'Profile'}
             }
@@ -100,6 +96,7 @@ class ProfileController {
             await Profile.update(
                 { photoProfile: cloudResponse.secure_url },
                 { where: { userId: req.user.id } }
+
             );
 
             res.json({ message: 'Image has been uploaded successfully' });
@@ -113,7 +110,6 @@ class ProfileController {
         try {
             const findProfile = await Profile.findOne({where : {userId : req.user.id}})
             const {bio} = req.body
-            // console.log(findProfile, '<<<');
             if(!findProfile){
                 res.status(404).json({message : `You haven't made a profile yet`})
             }
