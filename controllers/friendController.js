@@ -1,14 +1,16 @@
-const { Friend, User } = require('../models');
+const { Friend, User } = require('../models/index');
 
 class FriendController {
-
     static async getFriends(req, res, next) {
         try {
-            const { userId } = req.user; 
+            const { id: userId } = req.user;
+            console.log(userId, '<<<<');
             const friends = await Friend.findAll({
-                where: { userId },
+                where: {
+                    userId
+                },
                 include: [
-                    { model: User, as: 'Friend' }
+                    { model: User, as: 'FriendUser', foreignKey: 'friendId', attributes: ['id','username'] }
                 ]
             });
             res.json(friends);
@@ -17,13 +19,16 @@ class FriendController {
         }
     }
 
-
     static async deleteFriend(req, res, next) {
         try {
-            const { friendId } = req.params;
-            const { userId } = req.user; 
+            // Pastikan pengguna terotentikasi
+            if (!req.user) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
 
-        
+            const { friendId } = req.params;
+            const { userId } = req.user;
+
             const friend = await Friend.findOne({
                 where: { userId, friendId }
             });
@@ -31,10 +36,9 @@ class FriendController {
             if (!friend) {
                 return res.status(404).json({ error: 'Friend not found' });
             }
-
-            // Hapus teman
+            
             await friend.destroy();
-            res.status(204).end(); // Tidak ada konten yang dikembalikan setelah berhasil dihapus
+            res.status(204).end(); 
         } catch (error) {
             next(error);
         }

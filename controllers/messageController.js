@@ -35,7 +35,8 @@ class MessageController {
         conversationMessages = {
             id: conversationMessages.id,
             message: conversationMessages.Messages,
-            receiverName: conversationMessages.Receiver.username
+            receiverName: conversationMessages.Receiver.username,
+            receiverId : conversationMessages.Receiver.id
         };
 
         res.status(200).json(conversationMessages);

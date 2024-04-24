@@ -11,8 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Friend.belongsTo(models.User, { foreignKey: 'userId', as: 'Owner' });
-      Friend.belongsTo(models.User, { foreignKey: 'friendId', as: 'Friend' });
+      Friend.belongsTo(models.User, { foreignKey: 'friendId', as: 'FriendUser' }); // Ubah asosiasi ini menjadi 'FriendUser'
     }
+    
     
   }
   Friend.init({
