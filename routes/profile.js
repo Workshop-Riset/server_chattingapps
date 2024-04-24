@@ -14,4 +14,9 @@ router.put('/profiles', authentication, ProfileController.updateProfile)
 router.patch('/profiles/:id', upload.single("foto"), ProfileController.uploadImage)
 
 
+router.get('/profiles',authentication,ProfileController.getProfile )
+router.post('/profiles', authentication, ProfileController.addProfile)
+router.put('/profiles', authentication, ProfileController.updateProfile)
+
+
 module.exports = router
