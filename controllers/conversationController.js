@@ -5,6 +5,7 @@ const {
     Friend,
     Profile
 } = require('../models');
+const { Op } = require('sequelize');
 
 class ConversationController {
 
@@ -19,7 +20,10 @@ class ConversationController {
 
             const conversations = await Conversation.findAll({
                 where: {
-                    receiverId: id
+                    [Op.or]: [
+                        { senderId: id },
+                        { receiverId: id }
+                    ]
                 },
                 include: [{
                         model: User,
@@ -45,12 +49,11 @@ class ConversationController {
                     }
                 ]
             });
-
+            // console.log(conversations, '<<<<<');
             let conversationsWithLastMessage = conversations.map(conversation => {
-                const senderLastMessage = conversation.Sender.SentMessages[0]; // Pesan terakhir yang dikirim
-                const receiverLastMessage = conversation.Receiver.ReceivedMessages[0]; // Pesan terakhir yang diterima
+                const senderLastMessage = conversation.Sender.SentMessages[0]; 
+                const receiverLastMessage = conversation.Receiver.ReceivedMessages[0]; 
     
-                // Memilih pesan terakhir antara pengirim dan penerima
                 let lastMessage;
                 let sender;
     
@@ -94,44 +97,11 @@ class ConversationController {
         }
     }
 
-    // static async getConversationById(req, res, next) {
-    //     try {
-    //         const {
-    //             conversationId
-    //         } = req.params;
-    //         const conversation = await Conversation.findByPk(conversationId, {
-    //             include: [{
-    //                     model: User,
-    //                     as: 'Sender'
-    //                 },
-    //                 {
-    //                     model: User,
-    //                     as: 'Receiver'
-    //                 },
-    //                 {
-    //                     model: Message,
-    //                     as: 'Messages'
-    //                 }
-    //             ]
-    //         });
-    //         if (!conversation) {
-    //             return res.status(404).json({
-    //                 error: 'Conversation not found'
-    //             });
-    //         }
-
-    //         res.json(conversation);
-    //     } catch (error) {
-    //         next(error);
-    //     }
-    // }
-
     static async createConversation(req, res, next) {
         try {
             const { receiverId } = req.params;
             const { id: senderId } = req.user;
     
-            // Pastikan pengguna telah berteman dengan penerima sebelum mengirim pesan
             const isFriend = await Friend.findOne({
                 where: {
                     userId: senderId,
@@ -145,15 +115,17 @@ class ConversationController {
                 };
             }
     
-            // Periksa apakah percakapan antara pengirim dan penerima sudah ada
             let conversation = await Conversation.findOne({
                 where: {
                     senderId,
                     receiverId
                 }
             });
-    
-            // Jika percakapan belum ada, buatlah baru
+            // if()
+            if(conversation){
+                res.status(400).json({message : `You've added to the conversation with him`})
+            }
+
             if (!conversation) {
                 conversation = await Conversation.create({
                     senderId,

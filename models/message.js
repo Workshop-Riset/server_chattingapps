@@ -75,7 +75,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     hooks : {
       beforeCreate : (message) => {
-        message.timestamp = new Date().getTime()
+        let timeNow = new Date()
+        let time = timeNow.getTime()
+        message.timestamp = time
       }
     },
     modelName: 'Message',

@@ -10,9 +10,12 @@ class MessageController {
     try {
         const { conversationId } = req.params;
         const { id } = req.user;
-        console.log(id, '<<<<<<');
+        console.log(id, 'ini idi');
         let conversation = await Conversation.findByPk(conversationId);
-        const receiverId = conversation.receiverId;
+        // const receiverId = conversation.receiverId;
+        if(!conversation){
+            res.status(404).json({message : 'Conversation not found'})
+        }
 
         let conversationMessages = await Conversation.findByPk(conversationId, {
             include: [{
@@ -27,11 +30,8 @@ class MessageController {
             }]
         });
 
-        // // Convert timestamp to time value
-        // conversationMessages.Messages.forEach(message => {
-        //     message.timestamp = new Date(message.timestamp).getTime();
-        // });
-
+        
+        
         conversationMessages = {
             id: conversationMessages.id,
             message: conversationMessages.Messages,
@@ -40,6 +40,7 @@ class MessageController {
 
         res.status(200).json(conversationMessages);
     } catch (error) {
+        // console.log(error, '<<<<<');
         next(error);
     }
 }
@@ -49,24 +50,39 @@ class MessageController {
     static async createMessage(req, res, next) {
         try {
             const {
-                conversationId
+                conversationId,receiverId
             } = req.params;
+
             const {
                 id: senderId
             } = req.user
             console.log(conversationId, '<<<<');
+
             const {
                 message
             } = req.body;
-            const conversation = await Conversation.findByPk(conversationId);
 
-            console.log(conversation, '<<<<<');
+            const conversation = await Conversation.findByPk(conversationId, {where : {senderId, receiverId}});
+
+            console.log(conversation, 'INI CONVERSATION');
+
+
+            
             if (!conversation) {
                 throw {
                     name: 'not found',
                     type: 'Conversation'
                 }
             }
+
+            if(conversation.senderId != senderId){
+                res.status(403).json({message : 'You are not authorized'})
+            }
+
+            if(conversation.receiverId != receiverId){
+                res.status(403).json({message : 'You are not authorized'})
+            }
+
             const newMessage = await Message.create({
                 conversationId,
                 senderId,
