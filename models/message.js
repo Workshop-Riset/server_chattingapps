@@ -69,22 +69,15 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     timestamp: {
-      type: DataTypes.DATE,
-      allowNull: false,
-      validate: {
-        isDate: {
-          msg: 'Timestamp must be a valid date'
-        },
-        notNull: {
-          msg: 'Timestamp cannot be empty'
-        },
-        notEmpty: {
-          msg: 'Timestamp cannot be empty'
-        }
-      }
+      type: DataTypes.DATE
     }
   }, {
     sequelize,
+    hooks : {
+      beforeCreate : (message) => {
+        message.timestamp = new Date().getTime()
+      }
+    },
     modelName: 'Message',
   });
 
