@@ -48,13 +48,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     bio: {
       type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        len: {
-          args: [4, 300],
-          msg: 'Bio must be between 4 and 300 characters'
-        }
-      }
     }
   }, {
     sequelize,
