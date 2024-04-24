@@ -9,8 +9,9 @@ router.get('/profiles',authentication,ProfileController.getProfile )
 router.post('/profiles', authentication, ProfileController.addProfile)
 router.put('/profiles', authentication, ProfileController.updateProfile)
 
+router.patch('/profiles/update-bio', authentication, ProfileController.patchBio)
 
-router.patch('/profiles/:id', upload.single("foto"), ProfileController.uploadImage)
+router.patch('/profiles/upload-img', authentication,upload.single("foto"), ProfileController.uploadImage)
 
 
 module.exports = router

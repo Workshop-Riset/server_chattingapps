@@ -79,7 +79,7 @@ class ProfileController {
 
     static async uploadImage(req, res, next) {
         try {
-            const findProfile = await Profile.findByPk(req.params.id);
+            const findProfile = await Profile.findOne({where : {userId : req.user.id}});
             if (!findProfile) {
                 throw {name: 'not found', type: 'Profile'}
             }
@@ -97,15 +97,30 @@ class ProfileController {
             const cloudResponse = await cloudinary.uploader.upload(base64Url);
             // console.log(cloudResponse,'>>>>');
 
-            await Profile``.update(
-                { photoPofile: cloudResponse.secure_url },
-                { where: { id: req.params.id } }
+            await Profile.update(
+                { photoProfile: cloudResponse.secure_url },
+                { where: { userId: req.user.id } }
             );
 
             res.json({ message: 'Image has been uploaded successfully' });
         } catch (error) {
             console.error(error);
             next(error);
+        }
+    }
+
+    static async patchBio(req,res,next){
+        try {
+            const findProfile = await Profile.findOne({where : {userId : req.user.id}})
+            const {bio} = req.body
+            // console.log(findProfile, '<<<');
+            if(!findProfile){
+                res.status(404).json({message : `You haven't made a profile yet`})
+            }
+            const updateBio = await Profile.update({bio},{where : {userId : req.user.id}})
+            res.status(200).json({message : 'Update bio succesfully'})
+        } catch (error) {
+            next(error)
         }
     }
 }
