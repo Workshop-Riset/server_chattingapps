@@ -1,3 +1,4 @@
+const { types } = require('pg');
 const {
     Profile, User
 } = require('../models/index')
