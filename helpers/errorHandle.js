@@ -39,6 +39,9 @@ function errorHandler(error, req, res, next) {
     }else if(error.name === 'BadRequest'){
         code = 400
         message = 'Kamu udah add user itu'
+    }else if(error.name === 'uniqueErr'){
+        code = 400
+        message = error.message
     }
 
     res.status(code).json({

@@ -123,9 +123,9 @@ class UserController {
             
             const friendList = await Friend.findAll()
 
-            let data = friendList.filter(user => user.userId === userId)
+            let data = friendList.filter(user => user.userId === userId) //dia filter friendList punya dia sendiri di filter
             console.log(data , '<<<<<<<<');
-            if(data.find(e => e.friendId === Number(friendId))){
+            if(data.find(e => e.friendId === Number(friendId))){ //handler error ketika add friend id yang sama
                 throw {name : 'BadRequest'}
             }
             // console.log(friendId, '>>');
