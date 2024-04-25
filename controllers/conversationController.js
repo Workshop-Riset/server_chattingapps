@@ -8,7 +8,7 @@ const {
 const { Op } = require('sequelize');
 
 class ConversationController {
-
+    
     static async getConversations(req, res, next) {
         try {
             const {
@@ -83,6 +83,7 @@ class ConversationController {
                 };
             });
             console.log(conversationsWithLastMessage, '<<<<<');
+
             let newConv = conversationsWithLastMessage.map((el) => {
                 let data = {
                     id : el.conversation.id,
