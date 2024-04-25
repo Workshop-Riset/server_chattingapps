@@ -41,6 +41,7 @@ class UserController {
 
     static async login(req, res, next) {
         try {
+            console.log('jaalaann bwangg');
             const {
                 email,
                 password
@@ -68,9 +69,10 @@ class UserController {
                     name: "Invalid email/password"
                 }
             }
-
+            console.log(findUser, '<<<<');
             const payload = {
-                id: findUser.id
+                id: findUser.id,
+                username : findUser.username
             }
             const accessToken = createToken(payload)
             res.status(200).json({
@@ -141,7 +143,7 @@ class UserController {
             if(!findId){
                 throw {name : 'not found', type : 'users'} //400 bad request
             }
-            
+            console.log('sampe sini ga nih <<<<');
             const newFriend = await Friend.create({
                 friendId,
                 userId
