@@ -82,12 +82,12 @@ class ConversationController {
                     sender
                 };
             });
-            // console.log(conversationsWithLastMessage, '<<<<<');
+            console.log(conversationsWithLastMessage, '<<<<<');
             let newConv = conversationsWithLastMessage.map((el) => {
                 let data = {
                     id : el.conversation.id,
-                    username : el.sender.username,
-                    lastMessage : el.lastMessage.message
+                    username : el.conversation.Receiver.username,
+                    lastMessage : el.conversation.Receiver.ReceivedMessages[el.conversation.Receiver.ReceivedMessages.length -1].message
                 }
                 return data
             })
