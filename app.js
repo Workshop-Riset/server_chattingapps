@@ -21,7 +21,13 @@ const messageRouter = require('./routes/message')
 const conversationRouter = require('./routes/conversation')
 const profileRouter = require('./routes/profile')
 const errorHandler = require('./helpers/errorHandle')
-const cors = require('cors')
+const cors = require('cors');
+const {
+  verify
+} = require('jsonwebtoken');
+const {
+  verifyToken
+} = require('./helpers/jwt');
 
 app.use(express.urlencoded({
   extended: false
@@ -33,13 +39,12 @@ app.get('/', (req, res) => {
   res.send("gassken")
 })
 
-app.use(router)
 
-router.use('/', userRouter)
-router.use('/', friendRouter)
-router.use('/', messageRouter)
-router.use('/', conversationRouter)
-router.use('/', profileRouter)
+app.use('/', userRouter)
+app.use('/', friendRouter)
+app.use('/', messageRouter)
+app.use('/', conversationRouter)
+app.use('/', profileRouter)
 
 app.use(errorHandler)
 
@@ -47,52 +52,59 @@ app.use(errorHandler)
 
 
 // socket
-const httpServer = createServer();
+const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: '*'
   },
 });
-  const DB = {
-    lastCount : 0,
-    onlineUsers : [],
-    message : [],
-  }
+const DB = {
+  lastCount: 0,
+  onlineUsers: [],
+  message: [],
+}
+
+console.log(DB.onlineUsers, '<<<<<<');
 io.on("connection", (socket) => {
-    if(socket.handshake.auth.access_token) {
-      DB.onlineUsers.push({
-        access_token : socket.handshake.auth.access_token,
-        id : socket.id
-      })
-    }
-
-    io.emit('users:online', DB.onlineUsers);
-
-    socket.on('message:send', (value) => {
-      DB.message.push({
-        message : value,
-        sender : socket.handshake.auth.username
-      })
+  console.log(verifyToken(socket.handshake.auth.token));
+  // console.log(socket.handshake.auth.token);
+  // console.log(socket.handshake);
+  let userName = verifyToken(socket.handshake.auth.token)
+  if (socket.handshake.auth.token) {
+    DB.onlineUsers.push({
+      token : socket.handshake.auth.token,
+      userName,
+      id: socket.id
     })
+  }
 
-    io.emit("message:new", DB.message);
+  io.emit('users:online', DB.onlineUsers);
 
-    socket.on("disconnect", () => {
-      DB.onlineUsers = DB.onlineUsers.filter(
-        (user) => user.username !== socket.handshake.auth.username
-      )
-
-      socket.broadcast.emit("user:online", DB.onlineUsers)
+  socket.on('message:send', (value) => {
+    DB.message.push({
+      message: value,
+      sender: socket.handshake.auth.token
     })
+  })
 
-    socket.emit("count:last", DB.lastCount)
+  io.emit("message:new", DB.message);
 
-    socket.on("count:add", (value) => {
-      DB.lastCount = value
+  socket.on("disconnect", () => {
+    DB.onlineUsers = DB.onlineUsers.filter(
+      (user) => user.token !== socket.handshake.auth.token
+    )
+    console.log(DB.onlineUsers, '< logoutttttt');
+    socket.broadcast.emit("users:online", DB.onlineUsers)
+  })
+  
+  socket.emit("count:last", DB.lastCount)
+
+  socket.on("count:add", (value) => {
+    DB.lastCount = value
 
 
-      socket.broadcast.emit("count:update", value)
-    })
+    socket.broadcast.emit("count:update", value)
+  })
 });
 
 httpServer.listen(port, () => {
