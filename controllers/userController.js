@@ -14,6 +14,13 @@ const {
     Op
 } = require('sequelize')
 const e = require('express')
+const {
+    OAuth2Client
+} = require('google-auth-library')
+
+
+const client = new OAuth2Client()
+const client_id = process.env.client_id
 
 class UserController {
     static async register(req, res, next) {
@@ -146,6 +153,44 @@ class UserController {
             res.status(201).json({message : 'Add friend successfully'})
         } catch (error) {
             // console.log(error);
+            next(error)
+        }
+    }
+
+    static async googleLogin(req, res, next) {
+        try {
+            const {
+                tokengoogle
+            } = req.headers
+
+            const ticket = await client.verifyIdToken({
+                idToken: tokengoogle,
+                audience: client_id
+            });
+
+            const googlePayload = ticket.getPayload()
+
+            const [user, created] = await User.findOrCreate({
+                where: {
+                    email: googlePayload.email
+                },
+                defaults: {
+                    username: googlePayload.name,
+                    email: googlePayload.email,
+                    password: String(Math.random() * 1000)
+                }
+            })
+
+            const payload = {
+                id: user.id
+            }
+
+            const accessToken = createToken(payload)
+
+            res.status(200).json({
+                accessToken
+            })
+        } catch (error) {
             next(error)
         }
     }

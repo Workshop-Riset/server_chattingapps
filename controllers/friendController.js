@@ -38,7 +38,7 @@ class FriendController {
             }
             
             await friend.destroy();
-            res.status(204).end(); 
+            res.status(204).json({message: "Delete Successfully"}).end(); 
         } catch (error) {
             next(error);
         }
